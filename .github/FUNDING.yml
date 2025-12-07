@@ -1,3 +1,117 @@
-# These are supported funding model platforms
+# نصب کتابخانه‌های لازم (اولین بار فقط یکبار اجرا کن)
+!pip install schemdraw matplotlib numpy
+
+# واردات کتابخانه‌ها
+import schemdraw
+import schemdraw.elements as elm
+import matplotlib.pyplot as plt
+import numpy as np
+from schemdraw import dsp
+
+# تنظیمات فونت و اندازه برای مقاله
+plt.rcParams.update({
+    "font.size": 11,
+    "font.family": "Arial",
+    "text.usetex": False,
+    "figure.figsize": (12, 9),
+    "figure.dpi": 300
+})
+
+# ایجاد شکل با Schemdraw
+with schemdraw.Drawing() as d:
+    d.config(unit=2.8, fontsize=12, font='Arial')
+
+    # جعبه اصلی: Western Dietary Pattern
+    western = elm.Rectangle(w=6, h=2.2).label(
+        r'''$\bf{Western\ Dietary\ Pattern}$\n''' +
+        '''(Processed meats, fast food,\nchicken, fish, hydrogenated oils,\nlow-fat dairy, olive oil, refined grains)''',
+        fontsize=13, loc='center'
+    ).color('#E74C3C').fill('#FDEDEC')
+
+    d.move(0, -4)
+
+    # مسیرهای اصلی به سمت متغیرهای واسطه و نهایی
+    # 1. مسیر چاقی و چربی مرکزی
+    d += elm.Line().down().length(2)
+    obesity_box = elm.Rectangle(w=5, h=1.8).label(
+        r'''$\bf{Anthropometric\ Worsening}$\n''' +
+        '''↑ BMI (+1.41 kg/m²)\n''' +
+        '''↑ Waist Circumference (+3.67 cm)\n''' +
+        '''↑ Neck & Wrist Circumference''',
+        fontsize=12, loc='center'
+    ).color('#C0392B').fill('#FADBD8')
+    d.move(0, -3)
+
+    # 2. مسیر لیپیدها
+    d.push()
+    d += elm.Line().right().length(6)
+    d += elm.Line().down().length(3)
+    lipid_box = elm.Rectangle(w=5.5, h=2.2).label(
+        r'''$\bf{Dyslipidemia\ (Highly\ Significant)}$\n''' +
+        '''↑ Total Cholesterol (+11.81 mg/dL)\n''' +
+        '''↑ LDL-C (+9.54 mg/dL)\n''' +
+        '''↑ LDL/HDL ratio (+0.16)\n''' +
+        '''↑ Atherogenic Index of Plasma (+0.08)\n''' +
+        '''↑ TC/HDL ratio (+0.22)''',
+        fontsize=11.5, loc='center'
+    ).color('#8E44AD').fill('#EBDEF0')
+    d.pop()
+
+    # 3. مسیر فشار خون (فقط Model 1 و 2 معنادار بود → در Model 3 حذف شد)
+    # پس فقط اشاره ضعیف می‌کنیم
+    d.push()
+    d += elm.Line().left().length(6)
+    d += elm.Line().down().length(3)
+    bp_box = elm.Rectangle(w=5, h=1.4).label(
+        r'''Blood\ Pressure\n''' +
+        '''↑ SBP & DBP (only crude/energy-adjusted)\n''' +
+        '''Not significant after full adjustment''',
+        fontsize=10, loc='center'
+    ).color('#7F8C8D').fill('#EAECEE')
+    d.pop()
+
+    # 4. مسیر التهاب/استرس اکسیداتیو (بر اساس بحث مقاله)
+    d += elm.Line().down().length(2)
+    mech_box = elm.Rectangle(w=7, h=2).label(
+        r'''$\bf{Plausible\ Biological\ Mechanisms}$\n''' +
+        '''• High sodium → RAAS activation → fluid retention\n''' +
+        '''• Trans fats & AGEs → insulin resistance\n''' +
+        '''• Refined carbs → hepatic VLDL secretion ↑\n''' +
+        '''• Oxidized LDL → endothelial dysfunction\n''' +
+        '''• Chronic inflammation & oxidative stress ↑''',
+        fontsize=11, loc='center'
+    ).color('#2980B9').fill('#D6EAF8')
+
+    # نتیجه نهایی: ریسک قلبی‌عروقی
+    d += elm.Line().down().length(3)
+    cvd_box = elm.Rectangle(w=8, h=2).label(
+        r'''$\bf{Increased\ Cardiovascular\ Risk}$\n''' +
+        '''in Hemodialysis Patients\n\n''' +
+        '''(Residual CV risk acceleration\n''' +
+        '''in a population with >50% 5-year mortality)''',
+        fontsize=14, loc='center'
+    ).color('#C0392B').fill('#F5B7B1').linewidth(3)
+
+    # اضافه کردن فلش‌های رنگی
+    d += elm.Arrow().up().at(western.center).to(obesity_box.center).color('#E74C3C').linewidth(3)
+    d += elm.Arrow().up().at(western.center).to(lipid_box.center).color('#8E44AD').linewidth(3)
+    d += elm.Arrow().up().at(western.center).to(bp_box.center).color('#95A5A6').linewidth(2).style('--')
+    d += elm.Arrow().down().at(obesity_box.center).to(mech_box.center).color('#E74C3C')
+    d += elm.Arrow().down().at(lipid_box.center).to(mech_box.center).color('#8E44AD')
+    d += elm.Arrow().down().at(mech_box.center).to(cvd_box.center).color('#C0392B').linewidth(4)
+
+    # عنوان شکل
+    fig = d.draw()
+    fig.savefig('Figure_2_Western_Diet_Mechanism.png', dpi=400, bbox_inches='tight', facecolor='white')
+    fig.savefig('Figure_2_Western_Diet_Mechanism.pdf', bbox_inches='tight')  # برای مقاله خیلی مناسبه
+
+# نمایش در کولب
+from IPython.display import Image, display
+display(Image('Figure_2_Western_Diet_Mechanism.png'))
+
+# دانلود خودکار
+from google.colab import files
+files.download('Figure_2_Western_Diet_Mechanism.png')
+files.download('Figure_2_Western_Diet_Mechanism.pdf')# These are supported funding model platforms
 
 github: [prasmussen]
